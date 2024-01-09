@@ -1,0 +1,71 @@
+import numpy as np
+
+class MultilayerPerceptron:
+    def __init__(self, input_size, hidden_size, output_size, learning_rate=0.1, epochs=1000):
+        self.input_size = input_size
+        self.hidden_size = hidden_size
+        self.output_size = output_size
+        self.learning_rate = learning_rate
+        self.epochs = epochs
+
+        # Initialize weights and biases for hidden and output layers
+        self.weights_input_hidden = np.random.randn(self.hidden_size, self.input_size)
+        self.bias_hidden = np.random.randn(self.hidden_size, 1)
+        self.weights_hidden_output = np.random.randn(self.output_size, self.hidden_size)
+        self.bias_output = np.random.randn(self.output_size, 1)
+
+    def sigmoid(self, x):
+        return 1 / (1 + np.exp(-x))
+
+    def sigmoid_derivative(self, x):
+        return x * (1 - x)
+
+    def forward_pass(self, inputs):
+        # Forward pass through the network
+        hidden_layer_input = np.dot(self.weights_input_hidden, inputs) + self.bias_hidden
+        hidden_layer_output = self.sigmoid(hidden_layer_input)
+
+        output_layer_input = np.dot(self.weights_hidden_output, hidden_layer_output) + self.bias_output
+        output = self.sigmoid(output_layer_input)
+
+        return hidden_layer_output, output
+
+    def backward_pass(self, inputs, targets, hidden_output, output):
+        # Backpropagation algorithm to update weights and biases
+        output_error = targets - output
+        output_delta = output_error * self.sigmoid_derivative(output)
+
+        hidden_error = np.dot(self.weights_hidden_output.T, output_delta)
+        hidden_delta = hidden_error * self.sigmoid_derivative(hidden_output)
+
+        self.weights_hidden_output += self.learning_rate * np.dot(output_delta, hidden_output.T)
+        self.bias_output += self.learning_rate * np.sum(output_delta, axis=1, keepdims=True)
+        self.weights_input_hidden += self.learning_rate * np.dot(hidden_delta, inputs.T)
+        self.bias_hidden += self.learning_rate * np.sum(hidden_delta, axis=1, keepdims=True)
+
+    def train(self, inputs, targets):
+        for epoch in range(self.epochs):
+            for i in range(len(inputs)):
+                input_data = inputs[i].reshape(-1, 1)
+                target = targets[i].reshape(-1, 1)
+
+                hidden_output, output = self.forward_pass(input_data)
+                self.backward_pass(input_data, target, hidden_output, output)
+
+# Example usage for a simple classification task
+if __name__ == "__main__":
+    # Sample dataset for XOR gate
+    input_data = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+    target_data = np.array([[0], [1], [1], [0]])
+
+    # Create an MLP for XOR gate (input_size=2, hidden_size=4, output_size=1)
+    mlp = MultilayerPerceptron(input_size=2, hidden_size=4, output_size=1, learning_rate=0.1, epochs=5000)
+
+    # Train the MLP on the XOR gate problem
+    mlp.train(input_data, target_data)
+
+    # Test the trained network
+    print("Predictions after training:")
+    for i in range(len(input_data)):
+        hidden_output, output = mlp.forward_pass(input_data[i].reshape(-1, 1))
+        print(f"Input: {input_data[i]}, Predicted Output: {output[0][0]}")
