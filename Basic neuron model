@@ -1,0 +1,29 @@
+import numpy as np
+
+class Neuron:
+    def __init__(self, input_size):
+        self.weights = np.random.randn(input_size)  # Initialize weights randomly
+        self.bias = np.random.randn()  # Initialize bias randomly
+
+    def sigmoid(self, x):
+        return 1 / (1 + np.exp(-x))
+
+    def forward(self, inputs):
+        weighted_sum = np.dot(inputs, self.weights) + self.bias
+        output = self.sigmoid(weighted_sum)
+        return output
+
+# Example usage
+if __name__ == "__main__":
+    # Create a neuron with 3 input nodes
+    neuron = Neuron(3)
+
+    # Input values
+    inputs = np.array([0.5, 0.3, 0.2])
+
+    # Perform forward pass to get the output
+    output = neuron.forward(inputs)
+
+    # Display the output
+    print("Input:", inputs)
+    print("Output:", output)
