@@ -6,13 +6,8 @@ class NeuralNetwork:
         self.layer_sizes = layer_sizes
         self.learning_rate = learning_rate
         self.epochs = epochs
-        self.weights = []
-        self.biases = []
-
-        # Initialize weights and biases randomly
-        for i in range(1, self.num_layers):
-            self.weights.append(np.random.randn(layer_sizes[i], layer_sizes[i - 1]))
-            self.biases.append(np.random.randn(layer_sizes[i], 1))
+        self.weights = [np.random.randn(y, x) for x, y in zip(layer_sizes[:-1], layer_sizes[1:])]
+        self.biases = [np.random.randn(y, 1) for y in layer_sizes[1:]]
 
     def sigmoid(self, x):
         return 1 / (1 + np.exp(-x))
@@ -23,8 +18,8 @@ class NeuralNetwork:
     def forward_propagation(self, inputs):
         activations = inputs
         activated_outputs = [activations]
-        for i in range(self.num_layers - 1):
-            weighted_sum = np.dot(self.weights[i], activations) + self.biases[i]
+        for w, b in zip(self.weights, self.biases):
+            weighted_sum = np.dot(w, activations) + b
             activations = self.sigmoid(weighted_sum)
             activated_outputs.append(activations)
         return activated_outputs
@@ -32,8 +27,8 @@ class NeuralNetwork:
     def backward_propagation(self, inputs, targets, activated_outputs):
         error = targets - activated_outputs[-1]
         deltas = [error * self.sigmoid_derivative(activated_outputs[-1])]
-        for i in range(self.num_layers - 2, 0, -1):
-            delta = np.dot(self.weights[i].T, deltas[-1]) * self.sigmoid_derivative(activated_outputs[i])
+        for w, act in zip(reversed(self.weights[1:]), reversed(activated_outputs[1:-1])):
+            delta = np.dot(w.T, deltas[-1]) * self.sigmoid_derivative(act)
             deltas.append(delta)
 
         deltas.reverse()
@@ -44,7 +39,7 @@ class NeuralNetwork:
             self.biases[i] += self.learning_rate * np.sum(deltas[i], axis=1, keepdims=True)
 
     def train(self, inputs, targets):
-        for epoch in range(self.epochs):
+        for _ in range(self.epochs):
             activated_outputs = self.forward_propagation(inputs)
             self.backward_propagation(inputs, targets, activated_outputs)
 
@@ -54,19 +49,12 @@ class NeuralNetwork:
 
 # Example usage and evaluation on a sample dataset
 if __name__ == "__main__":
-    # Sample dataset (input and output)
     input_data = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
     output_data = np.array([[0], [1], [1], [0]])
 
-    # Create a neural network with customizable architecture
-    # Define the number of neurons in each layer (input, hidden, output)
     neural_network = NeuralNetwork(layer_sizes=[2, 4, 1], learning_rate=0.1, epochs=5000)
-
-    # Train the neural network
     neural_network.train(input_data.T, output_data.T)
 
-    # Test the trained network
-    predictions = neural_network.predict(input_data.T)
     print("Predictions after training:")
-    for i in range(len(input_data)):
-        print(f"Input: {input_data[i]}, Predicted Output: {predictions[0][i]}")
+    for i, pred in enumerate(neural_network.predict(input_data.T)[0]):
+        print(f"Input: {input_data[i]}, Predicted Output: {pred}")
