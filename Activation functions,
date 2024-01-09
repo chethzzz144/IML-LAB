@@ -1,0 +1,46 @@
+import numpy as np
+
+class ActivationFunctions:
+    @staticmethod
+    def sigmoid(x):
+        return 1 / (1 + np.exp(-x))
+
+    @staticmethod
+    def tanh(x):
+        return np.tanh(x)
+
+    @staticmethod
+    def relu(x):
+        return np.maximum(0, x)
+
+class Neuron:
+    def __init__(self, input_size, activation_function):
+        self.weights = np.random.randn(input_size)
+        self.bias = np.random.randn()
+        self.activation_function = activation_function
+
+    def forward(self, inputs):
+        weighted_sum = np.dot(inputs, self.weights) + self.bias
+        output = self.activation_function(weighted_sum)
+        return output
+
+# Example usage and comparison of activation functions
+if __name__ == "__main__":
+    # Create neurons with different activation functions
+    sigmoid_neuron = Neuron(3, ActivationFunctions.sigmoid)
+    tanh_neuron = Neuron(3, ActivationFunctions.tanh)
+    relu_neuron = Neuron(3, ActivationFunctions.relu)
+
+    # Input values
+    inputs = np.array([0.5, 0.3, -0.2])
+
+    # Forward pass through neurons
+    output_sigmoid = sigmoid_neuron.forward(inputs)
+    output_tanh = tanh_neuron.forward(inputs)
+    output_relu = relu_neuron.forward(inputs)
+
+    # Display the outputs for each activation function
+    print("Input:", inputs)
+    print("Sigmoid Output:", output_sigmoid)
+    print("Tanh Output:", output_tanh)
+    print("ReLU Output:", output_relu)
