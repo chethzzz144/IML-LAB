@@ -1,0 +1,35 @@
+import sympy as sp
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define the symbolic variable and function
+x = sp.symbols('x')
+f = 1 / x
+
+# Calculate the symbolic derivative
+f_prime = sp.diff(f, x)
+
+# Define the x range for plotting
+x_values = np.linspace(-3, 3, 400)
+
+plt.figure(figsize=(8, 6))
+
+# Plot the function
+plt.plot(x_values, 1 / x_values, label='f(x) = 1/x')
+
+# Calculate and plot tangent lines at x=1 and x=-1
+for x_val in [1, -1]:
+    tangent_line = sp.lambdify(x, f_prime.subs(x, x_val) * (x - x_val) + f.subs(x, x_val))(x_values)
+    plt.plot(x_values, tangent_line, label=f'Tangent at x={x_val}')
+
+    print("Slope at x = {} is {}".format(x_val, f_prime.subs(x, x_val)))
+    print("Tangent line is y = {}*x + {:.2f}".format(f_prime.subs(x, x_val), f.subs(x, x_val)))
+
+plt.xlabel('x')
+plt.ylabel('f(x)')
+plt.title('Graph of f(x) = 1/x and Tangent Lines')
+plt.axhline(0, color='black', linewidth=0.5)
+plt.axvline(0, color='black', linewidth=0.5)
+plt.legend()
+plt.grid(True)
+plt.show()
