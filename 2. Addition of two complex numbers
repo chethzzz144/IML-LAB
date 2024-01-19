@@ -1,0 +1,21 @@
+class COMPLEX:
+    def __init__(self, real_part, img_part):
+        self.real_part = real_part
+        self.img_part = img_part
+
+    def display(self):
+        print(f"{self.real_part} + {self.img_part}j")
+
+C1 = COMPLEX(3, 4)  # 3 + 4j
+C2 = COMPLEX(1, 2)  # 1 + 2j
+
+C3 = COMPLEX(C1.real_part + C2.real_part, C1.img_part + C2.img_part)
+
+print("C1:")
+C1.display()
+
+print("C2:")
+C2.display()
+
+print("C3 (Result of adding C1 and C2):")
+C3.display()
