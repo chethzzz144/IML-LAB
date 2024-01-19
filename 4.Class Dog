@@ -2,10 +2,7 @@ from datetime import datetime
 
 class Dog:
     def __init__(self, name, size, breed="Unknown", dob="Unknown"):
-        self.name = name
-        self.size = size
-        self.breed = breed
-        self.dob = dob
+        self.name, self.size, self.breed, self.dob = name, size, breed, dob
 
     def bark(self):
         print("Woof!")
@@ -14,26 +11,18 @@ class Dog:
         return self.name
 
     def set_name(self, new_name):
-        if 2 <= len(new_name) <= 30 and new_name.isalpha():
-            self.name = new_name.title()
-        else:
-            print("Invalid name. Please provide an alphabetical name between 2 and 30 characters.")
+        self.name = new_name.title() if 2 <= len(new_name) <= 30 and new_name.isalpha() else (
+            print("Invalid name. Please provide an alphabetical name between 2 and 30 characters."), self.name)[1]
 
     def dog_years(self):
-        if self.dob != "Unknown":
-            today = datetime.today()
-            dob = datetime.strptime(self.dob, "%d/%m/%Y")
-            age_in_years = (today - dob).days / 365.25
-            age_in_dog_years = int(age_in_years * 7)
-            return age_in_dog_years
-        else:
-            print("Dog's date of birth is unknown. Unable to calculate dog years.")
+        return int(((datetime.today() - datetime.strptime(self.dob, "%d/%m/%Y")).days / 365.25 * 7)
+                   if self.dob != "Unknown" else (
+                       print("Dog's date of birth is unknown. Unable to calculate dog years."), 0)[1])
 
 # Example usage:
 my_dog = Dog(name="Buddy", size="Medium", breed="Labrador", dob="10/05/2018")
 
 my_dog.bark()
-
 print(f"Dog's name: {my_dog.get_name()}")
 
 my_dog.set_name("Max")
