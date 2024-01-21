@@ -1,0 +1,33 @@
+import numpy as np
+import pandas as pd
+
+data = pd.read_csv('enjoysport.csv')
+
+concepts = np.array(data.iloc[:, :-1])
+target = np.array(data.iloc[:, -1])
+
+def learn(concepts, target):
+    specific_h = concepts[0].copy()
+    general_h = [['?' if h_i != specific_h_i else specific_h_i for h_i in specific_h] for specific_h_i in specific_h]
+
+    for i, (h, t) in enumerate(zip(concepts, target)):
+        print(f"Instance {i+1} is {h}")
+        print(f"Instance {i+1} is {'positive' if t == 'yes' else 'negative'}")
+        
+        for x in range(len(specific_h)):
+            if t == 'yes' and h[x] != specific_h[x]:
+                general_h[x][x] = specific_h[x] = '?'
+            elif t == 'no' and h[x] != specific_h[x]:
+                general_h[x][x] = '?'
+        
+        print(f"After instance {i+1} general hypothesis is : {general_h}")
+        print(f"After instance {i+1} specific hypothesis is : {specific_h}")
+
+    general_h = [h for h in general_h if '?' not in h]
+    return general_h, specific_h
+
+general_h, specific_h = learn(concepts, target)
+
+print('--------------------------------------------------------------------------------')
+print("General Hypothesis : ", general_h)
+print("Specific Hypothesis : ", specific_h)
